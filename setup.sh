@@ -1,26 +1,8 @@
-#!/bin/bash
-# Setup script for iMessage Wrapped
-
-echo "Setting up iMessage Wrapped..."
-
-# Create virtual environment
-echo "Creating virtual environment..."
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")"
 python3 -m venv venv
-
-# Activate virtual environment
-echo "Activating virtual environment..."
-source venv/bin/activate
-
-# Install dependencies
-echo "Installing dependencies..."
-pip install -r requirements.txt
-
-echo ""
-echo "✓ Setup complete!"
-echo ""
-echo "To run the app:"
-echo "  1. Activate virtual environment: source venv/bin/activate"
-echo "  2. Run Streamlit app: streamlit run web/app.py"
-echo ""
-echo "To deactivate virtual environment when done:"
-echo "  deactivate"
+venv/bin/python -m pip install -r requirements.txt
+npm --prefix frontend ci
+npm run build
+printf '\nReady. Run npm start, then open http://127.0.0.1:8501\n'

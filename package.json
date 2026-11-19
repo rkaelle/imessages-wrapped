@@ -1,0 +1,4 @@
+{
+  "name": "imessage-wrapped", "private": true, "version": "2.0.0",
+  "scripts": {"dev": "node scripts/dev.mjs", "build": "npm --prefix frontend run build", "start": "venv/bin/python -B -m backend.server", "test": "venv/bin/python -B -m unittest discover -s tests -v"}
+}

@@ -1,78 +1,11 @@
-# Installation Guide
+# Installation
 
-## Quick Start
+1. Run `./setup.sh` from the project directory.
+2. Run `npm start`.
+3. Open http://127.0.0.1:8501.
+4. If Messages access is denied, enable Full Disk Access for the app launching the server and restart it.
+5. To display names, open Contact names in the sidebar, click Allow Contacts, and approve macOS's dialog. Retry name lookup after any permission change.
 
-### Option 1: Using the Setup Script (Recommended)
+Development: `npm run dev` starts both the API and Vite. Production-style local use: `npm run build` then `npm start`.
 
-```bash
-chmod +x setup.sh
-./setup.sh
-```
-
-Then run the app:
-```bash
-source venv/bin/activate
-streamlit run web/app.py
-```
-
-### Option 2: Manual Setup
-
-1. **Create a virtual environment:**
-```bash
-python3 -m venv venv
-```
-
-2. **Activate the virtual environment:**
-```bash
-source venv/bin/activate
-```
-
-3. **Install dependencies:**
-```bash
-pip install -r requirements.txt
-```
-
-4. **Run the app:**
-```bash
-streamlit run web/app.py
-```
-
-5. **When done, deactivate:**
-```bash
-deactivate
-```
-
-## Verifying Installation
-
-After setup, verify everything works:
-
-```bash
-source venv/bin/activate
-python test_basic.py
-```
-
-All tests should pass if installation was successful.
-
-## System Requirements
-
-- macOS (for iMessage database access)
-- Python 3.8 or higher
-- Full Disk Access for Terminal (System Preferences > Privacy & Security)
-
-## Troubleshooting
-
-### "No module named 'pandas'" or similar
-- Make sure you activated the virtual environment: `source venv/bin/activate`
-- You should see `(venv)` in your terminal prompt
-
-### "Failed to connect to iMessage database"
-- Grant Full Disk Access to Terminal in System Preferences > Privacy & Security
-- Ensure Messages app has synced data to this Mac
-
-### Streamlit won't start
-- Make sure virtual environment is activated
-- Try: `python -m streamlit run web/app.py`
-
-### Homebrew pip warnings
-- Using a virtual environment (recommended approach) avoids these warnings
-- Virtual environments are isolated and won't affect system packages
+Stop with Ctrl+C. Startup does not register a background service or a login item. All Messages and Contacts operations are reads.

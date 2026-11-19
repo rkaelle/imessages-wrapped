@@ -53,3 +53,9 @@ output/
 # Environments
 .env
 .env.local
+
+# React build and package artifacts
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+*.log

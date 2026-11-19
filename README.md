@@ -1,104 +1,55 @@
 # iMessage Wrapped
 
-Ever wondered who actually texts you back? Or which group chat you're ignoring? This thing analyzes your iMessage history and turns it into shareable stats.
+A local React site inspired by Apple Messages: a conversation sidebar, blue and gray bubbles, and a personal story built from the message history on your Mac.
 
-Basically Spotify Wrapped but for your texts.
+## Run
 
-## What it does
+Requires macOS, Python 3.10+, and Node.js 20.19+ (or 22.12+).
 
-Digs through your iMessage database (yeah, Apple stores everything locally) and shows you:
-
-- Who you text the most
-- Who ghosts you the hardest
-- Your most chaotic group chats
-- What time you're most likely to be on your phone
-- How many messages you've sent (prepare to be horrified)
-- Your "texting personality" based on your habits
-
-You can look at the past year or go full send and analyze everything since you got your first iPhone.
-
-## Setup
-
-You need Python 3.8 or newer. Install dependencies:
-
-```bash
-pip install -r requirements.txt
+```sh
+./setup.sh
+npm start
 ```
 
-**Important:** On macOS, you'll need to give Terminal (or whatever you're running this from) Full Disk Access. Go to System Preferences > Privacy & Security > Full Disk Access and enable it. Otherwise this won't be able to read your messages.
+Open **http://127.0.0.1:8501**. The server listens only on loopback. For frontend development, run `npm run dev` and open the Vite URL; it proxies the local API on port 8501.
 
-## Running it
+## Features
 
-### Web version (easier)
+- Overview of message volume, people, group chats, and monthly activity.
+- Five-chapter Wrapped story for all time or a calendar year.
+- Searchable relationship pages: sent/received timeline, observed reply gaps, shared emojis, and reactions.
+- Calendar-year comparisons with archive coverage and changes by person.
+- Real Tapback addition/removal counts, including custom emoji reactions.
+- Contacts connection status, explicit permission request, and retry. Multiple phone numbers/emails linked to one macOS contact become one person.
 
-```bash
-streamlit run web/app.py
+## Permissions
+
+Messages lives at `~/Library/Messages/chat.db`. Enable Full Disk Access for the application launching the server (for example Ghostty or Terminal). macOS may require quitting and reopening that application before access works.
+
+Contacts has a separate permission. In the sidebar, open **Contact names**, click **Allow Contacts…**, and approve the macOS dialog. If denied, enable Contacts access for the application named by macOS in System Settings → Privacy & Security → Contacts, then click **Retry name lookup**. Numbers without an accessible matching contact remain numbers; the app does not guess names.
+
+## Data handling
+
+The new runtime is `backend/` plus `frontend/`. It does not send messages, edit contacts, upload data, or expose a message-composer endpoint. No remote fonts, analytics, CDN scripts, or cloud APIs are used. All analysis and name mappings stay in memory. Message bodies are read only for selected-person emoji analysis; the API returns emoji counts, not message bodies.
+
+The only Messages connection factory is `backend/database.py`: SQLite `mode=ro`, `PRAGMA query_only=ON`, and an authorizer that rejects all actions except reads, selections, and query functions. It never creates a missing Messages database. Contacts uses fetch requests only, never save requests. Do not run this app through a public tunnel or expose its port: local results contain personal information.
+
+## What the numbers mean
+
+- Messages are ordinary message rows, excluding system events, retracted messages, spam, and associated events such as Tapbacks. A canonical chat join avoids duplicate counting.
+- Direct-chat outgoing messages are attributed using the chat participants, rather than the outgoing message's often-empty handle. Group chats are identified using style 43 or multiple participants.
+- Calendar years and activity hours use the Mac's local timezone. Only history available on this Mac is included. Current and partially synced years are not normalized or extrapolated.
+- Reply times are medians of consecutive direct-message sender switches, excluding gaps over 24 hours. They do not indicate read time, availability, or relationship quality.
+- Tapback totals count addition events during the period. Removal events are separate. These totals do not claim to measure currently active reactions. Stickers and other associated events are excluded and counted separately.
+- Emoji counts use text or a structured typedstream decoder. Unsupported/missing bodies are excluded with coverage shown. No binary printable-text guessing, sentiment scoring, or implausible longest-message records.
+
+## Verify
+
+```sh
+npm test
+npm run build
 ```
 
-Opens in your browser. You can toggle between past year vs all time, click around, and export images to share. There's an option to anonymize names if you don't want people knowing who you text.
+Tests use synthetic databases in temporary directories. Mutation-rejection tests never run against your Messages database.
 
-### Code version
-
-If you just want the images without the web interface:
-
-```python
-from src.database import iMessageDatabase
-from src.analyzer import MessageAnalyzer
-from src.visualizations import VisualizationGenerator
-from src.utils import get_time_period
-
-db = iMessageDatabase()
-start_date, end_date = get_time_period("past_year")
-messages = db.get_messages(start_date, end_date)
-
-analyzer = MessageAnalyzer(messages)
-viz = VisualizationGenerator()
-viz.generate_all_images(analyzer, "Past Year", anonymize=False)
-```
-
-Images get saved to `output/` as PNGs.
-
-## What gets generated
-
-- Summary (total messages, sent vs received)
-- Top contacts
-- Time heatmap (hour by hour, day by day)
-- Ghosting analysis (who leaves you on read)
-- Fast responders (who actually texts back)
-- Group chat rankings
-- Texting personality card
-
-## Privacy stuff
-
-Everything runs locally. No data leaves your computer. The app only reads from your iMessage database, it doesn't modify anything. No APIs, no cloud uploads, no tracking. Just your Mac and your messages.
-
-## Troubleshooting
-
-**"Failed to connect to iMessage database"**
-You probably didn't enable Full Disk Access. Check System Preferences.
-
-**"No data available"**
-Try "All Time" instead of "Past Year" - you might not have much recent activity.
-
-**It's slow**
-If you have like 100,000+ messages this will take a minute. First run is slower, then it caches stuff.
-
-## How it works
-
-Apple stores all your iMessages in a SQLite database at `~/Library/Messages/chat.db`. This reads from that database (specifically the `message`, `handle`, `chat`, and join tables) and does some basic stats.
-
-Dates are stored as nanoseconds since Jan 1, 2001 because Apple is quirky like that. The code handles the conversion.
-
-Ghosting is calculated as "messages they sent you within 24h after you messaged them" divided by "total messages you sent them". Response time is the median gap between your message and their next one.
-
-## License
-
-MIT - do whatever you want with it
-
-## Built with
-
-- Python 3
-- Streamlit for the web UI
-- Pandas for data wrangling
-- Matplotlib/Seaborn for charts
-- Your questionable texting habits
+The former Streamlit implementation is preserved in `legacy/` for reference. It is not imported or served by the React app; its extra dependencies are not needed.

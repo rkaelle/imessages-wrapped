@@ -1,0 +1,18 @@
+export type ContactStatus = {state:string;detail:string;loaded:number;matched:number;unmatched:number};
+export type Point = {period:string;sent:number;received:number};
+export type Streak = {days:number;start:string;end:string}|null;
+export type Person = {id:string;name:string;resolved:boolean;total:number;sent:number;received:number;first:string;last:string;sparkline:number[]};
+export type Reactions = {items:{emoji:string;label:string;count:number;sent:number;received:number}[];total:number;removed:number;other_events:number;method:string};
+export type Summary = {year:string;years:number[];total:number;sent:number;received:number;people:number;groups:number;active_days:number;busiest_day:{date:string;count:number}|null;peak_hour:number|null;coverage:{first:string|null;last:string|null};previous_total:number;change:number|null;top_people:Person[];timeline:Point[];contacts:ContactStatus;reactions:Reactions;loaded_at:string;
+ rhythm:number[][];streak:Streak;late_night:number|null;calendar:{year:number;days:Record<string,number>}|null;top_groups:{id:string;name:string|null;total:number}[];stale?:boolean;
+ streaks:{longest:{id:string;name:string;days:number;start:string;end:string}[];current:{id:string;name:string;days:number}[]};habits:Habits|null;laughs:Laughs};
+export type Habits = {sent:number;late_night:number;early_morning:number;double_text:number;avg_length:number|null;tapbacks_per_100:number;starts_share:number|null;reply_median:number|null};
+export type Laughs = {years:number[];series:{label:string;values:number[];counts:number[]}[]};
+export type Detail = {id:string;name:string;resolved:boolean;addresses:number;total:number;sent:number;received:number;first:string|null;last:string|null;timeline:Point[];responses:{you:number|null;them:number|null;you_samples:number;their_samples:number};emojis:{items:{emoji:string;count:number}[];decoded:number;unreadable:number};reactions:Reactions;change:number|null;
+ rhythm:number[][];streak:Streak;initiations:{you:number;them:number;gap_hours:number};late_night:number|null;
+ reply_histogram:{bins:string[];you:number[];them:number[]};words:{word:string;count:number;ratio:number}[];media:Record<'photos'|'videos'|'voice'|'links'|'files',number>|null};
+export type OnThisDay = {date:string;years:{year:number;years_ago:number;total:number;date:string;people:{id:string;name:string;count:number}[];snippets:{text:string;sent:boolean;time:string}[]}[]};
+export type Network = {groups:{id:string;name:string;total:number;yours:number}[];people:{id:string;name:string;total:number}[];links:{person:string;group:string;weight:number}[]};
+export type SearchResult = {query:string;total:number;results:{id:number;text:string;sent:boolean;at:string;chat:{kind:'person'|'group';id:string;name:string};sender:string|null}[]};
+export type YearStats = Pick<Summary,'year'|'total'|'sent'|'received'|'people'|'groups'|'active_days'|'coverage'|'timeline'>;
+export type Comparison = {before:YearStats;after:YearStats;change:number|null;people:{id:string;name:string;before:number;after:number;difference:number;change:number|null}[];note:string};
